@@ -1,0 +1,196 @@
+<Page x:Class="MovieApp.Pages.AdminUsersPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="800"
+      Title="Управление пользователями"
+      Background="#141414">
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок и Поиск -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,15">
+            <TextBlock Text="Управление пользователями" FontSize="28" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+            <TextBox x:Name="TxtSearchUser" Background="#2A2A2A" Foreground="White" BorderBrush="#444444" Padding="8" 
+                     TextChanged="TxtSearchUser_TextChanged" GotFocus="TxtSearchUser_GotFocus" 
+                     LostFocus="TxtSearchUser_LostFocus" Text="Поиск по логину..."/>
+        </StackPanel>
+
+        <!-- Таблица пользователей -->
+        <DataGrid x:Name="UsersGrid"
+                  Grid.Row="1"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  SelectionMode="Single"
+                  Background="#141414"
+                  Foreground="White"
+                  BorderThickness="0"
+                  RowBackground="#1A1A1A"
+                  AlternatingRowBackground="#141414"
+                  GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="#333333"
+                  HeadersVisibility="Column"
+                  SelectionChanged="UsersGrid_SelectionChanged">
+            
+            <!-- Стили DataGrid для темной темы -->
+            <DataGrid.Resources>
+                <!-- Заголовки столбцов -->
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#111111"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Padding" Value="10,5"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                    <Setter Property="BorderBrush" Value="#333333"/>
+                </Style>
+                
+                <!-- Строки -->
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="#1A1A1A"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#E50914"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                
+                <!-- Ячейки -->
+                <Style TargetType="DataGridCell">
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Padding" Value="10,5"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="DataGridCell">
+                                <Border Background="{TemplateBinding Background}" 
+                                        BorderBrush="{TemplateBinding BorderBrush}" 
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Логин" Binding="{Binding Login}" Width="*"/>
+                <DataGridTextColumn Header="Пароль" Binding="{Binding Password}" Width="*"/>
+                <DataGridTextColumn Header="Роль" Binding="{Binding Role}" Width="150"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Панель управления (редактирование и добавление) -->
+        <StackPanel Grid.Row="2" Margin="0,20,0,0">
+            <!-- Редактирование выбранного пользователя -->
+            <Border Background="#1A1A1A"
+                    BorderBrush="#333333"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="Редактировать пользователя:" 
+                               FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+                    <WrapPanel VerticalAlignment="Center">
+                        <StackPanel Margin="0,0,15,5">
+                            <TextBlock Text="Логин:" Foreground="#AAAAAA" FontSize="12"/>
+                            <TextBlock x:Name="TxtSelectedLogin" Text="Не выбран" Foreground="White" FontSize="16" FontWeight="Bold" Width="150"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,15,5">
+                            <TextBlock Text="Пароль:" Foreground="#AAAAAA" FontSize="12"/>
+                            <TextBox x:Name="TxtEditPassword" Width="150" Background="#2A2A2A" Foreground="White" BorderBrush="#444444" Padding="5"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,15,5">
+                            <TextBlock Text="Роль:" Foreground="#AAAAAA" FontSize="12"/>
+                            <ComboBox x:Name="CmbRoles" Width="120">
+                                <ComboBoxItem Content="User"/>
+                                <ComboBoxItem Content="Moderator"/>
+                                <ComboBoxItem Content="Admin"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <Button x:Name="BtnSave" Content="Сохранить" Padding="20,8" Cursor="Hand" Click="BtnSave_Click" VerticalAlignment="Bottom" Margin="0,0,0,5">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Background" Value="#E50914"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="4">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Background" Value="#555555"/>
+                                            <Setter Property="Foreground" Value="#AAAAAA"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Добавление нового пользователя -->
+            <Border Background="#1A1A1A"
+                    BorderBrush="#333333"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Добавить пользователя:" 
+                               FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+                    <WrapPanel VerticalAlignment="Center">
+                        <StackPanel Margin="0,0,15,5">
+                            <TextBlock Text="Логин:" Foreground="#AAAAAA" FontSize="12"/>
+                            <TextBox x:Name="TxtAddLogin" Width="150" Background="#2A2A2A" Foreground="White" BorderBrush="#444444" Padding="5"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,15,5">
+                            <TextBlock Text="Пароль:" Foreground="#AAAAAA" FontSize="12"/>
+                            <TextBox x:Name="TxtAddPassword" Width="150" Background="#2A2A2A" Foreground="White" BorderBrush="#444444" Padding="5"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,15,5">
+                            <TextBlock Text="Роль:" Foreground="#AAAAAA" FontSize="12"/>
+                            <ComboBox x:Name="CmbAddRole" Width="120">
+                                <ComboBoxItem Content="User" IsSelected="True"/>
+                                <ComboBoxItem Content="Moderator"/>
+                                <ComboBoxItem Content="Admin"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <Button x:Name="BtnAddUser" Content="Добавить" Background="#0078D7" Foreground="White" BorderThickness="0" Padding="20,8" Cursor="Hand" Click="BtnAddUser_Click" VerticalAlignment="Bottom" Margin="0,0,0,5"/>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
+</Page>

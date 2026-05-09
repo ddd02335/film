@@ -1,0 +1,37 @@
+<Window x:Class="MovieApp.EditMovieWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Изменить фильм" Height="650" Width="450"
+        Background="#141414" WindowStartupLocation="CenterScreen">
+    
+    <Grid Margin="20">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="Редактирование фильма" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,0,0,15"/>
+
+                <TextBlock Text="Название:" Foreground="#AAAAAA" Margin="0,0,0,5"/>
+                <TextBox x:Name="TxtEditTitle" Background="#2A2A2A" Foreground="White" BorderBrush="#444444" Padding="5" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Год:" Foreground="#AAAAAA" Margin="0,0,0,5"/>
+                <TextBox x:Name="TxtEditYear" Background="#2A2A2A" Foreground="White" BorderBrush="#444444" Padding="5" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Рейтинг:" Foreground="#AAAAAA" Margin="0,0,0,5"/>
+                <TextBox x:Name="TxtEditRating" Background="#2A2A2A" Foreground="White" BorderBrush="#444444" Padding="5" Margin="0,0,0,10"/>
+
+                <TextBlock Text="URL постера:" Foreground="#AAAAAA" Margin="0,0,0,5"/>
+                <TextBox x:Name="TxtEditPoster" Background="#2A2A2A" Foreground="White" BorderBrush="#444444" Padding="5" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Возрастной рейтинг:" Foreground="#AAAAAA" Margin="0,0,0,5"/>
+                <TextBox x:Name="TxtEditAgeRating" Background="#2A2A2A" Foreground="White" BorderBrush="#444444" Padding="5" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Жанры:" Foreground="#AAAAAA" Margin="0,0,0,5"/>
+                <ListBox x:Name="LstEditGenres" DisplayMemberPath="Name" SelectionMode="Multiple" MinHeight="100" Background="#2A2A2A" Foreground="White" BorderBrush="#444444" Margin="0,0,0,15"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
+                    <Button Content="Отмена" Background="#333333" Foreground="White" BorderThickness="0" Padding="15,8" Cursor="Hand" Margin="0,0,10,0" Click="BtnCancel_Click"/>
+                    <Button Content="Сохранить" Background="#E50914" Foreground="White" BorderThickness="0" Padding="15,8" Cursor="Hand" Click="BtnSave_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

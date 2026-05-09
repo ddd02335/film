@@ -1,0 +1,89 @@
+<Page x:Class="MovieApp.Pages.ProfilePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="800"
+      Title="Профиль пользователя"
+      Background="#141414">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Верхняя секция: Аватар и Логин -->
+        <StackPanel Grid.Row="0" Margin="40,40,40,20" Orientation="Horizontal" VerticalAlignment="Center">
+            
+            <!-- Блок аватара -->
+            <StackPanel>
+                <Grid Width="100" Height="100">
+                    <!-- Заглушка (фон с буквой) -->
+                    <Ellipse x:Name="AvatarFallbackBackground" Fill="{StaticResource AccentRed}" />
+                    <TextBlock x:Name="TxtAvatarLetter"
+                               Text="?"
+                               FontSize="48"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                               
+                    <!-- Загруженное изображение аватара -->
+                    <Ellipse>
+                        <Ellipse.Fill>
+                            <ImageBrush x:Name="AvatarBrush" Stretch="UniformToFill"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </Grid>
+                
+                <!-- Кнопка изменения фото -->
+                <Button Content="Изменить фото"
+                        Margin="0,10,0,0"
+                        Padding="10,5"
+                        Background="#2A2A2A"
+                        Foreground="White"
+                        BorderThickness="1"
+                        BorderBrush="#444444"
+                        Cursor="Hand"
+                        Click="BtnChangeAvatar_Click"/>
+            </StackPanel>
+            
+            <TextBlock x:Name="TxtLogin"
+                       Text="Загрузка..."
+                       FontSize="36"
+                       FontWeight="SemiBold"
+                       Foreground="{StaticResource TextPrimary}"
+                       Margin="24,0,0,0"
+                       VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Секция статистики -->
+        <UniformGrid Grid.Row="1" Columns="3" Margin="30,0,30,40" VerticalAlignment="Top">
+            <!-- Карточка: Оценено фильмов -->
+            <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="20" Margin="10">
+                <StackPanel>
+                    <TextBlock Text="Оценено фильмов" FontSize="16" Foreground="{StaticResource TextMuted}" Margin="0,0,0,8"/>
+                    <TextBlock x:Name="TxtTotalRated" Text="0" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Карточка: Средняя оценка -->
+            <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="20" Margin="10">
+                <StackPanel>
+                    <TextBlock Text="Средняя оценка" FontSize="16" Foreground="{StaticResource TextMuted}" Margin="0,0,0,8"/>
+                    <TextBlock x:Name="TxtAverageScore" Text="0.0" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Карточка: Любимый жанр -->
+            <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="20" Margin="10">
+                <StackPanel>
+                    <TextBlock Text="Любимый жанр" FontSize="16" Foreground="{StaticResource TextMuted}" Margin="0,0,0,8"/>
+                    <TextBlock x:Name="TxtFavoriteGenre" Text="Нет данных" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+    </Grid>
+</Page>

@@ -1,0 +1,77 @@
+<Page x:Class="MovieApp.Pages.SupportTicketsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Жалобы пользователей"
+      Background="#141414">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" MinHeight="200"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Жалобы и обращения" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+
+        <DataGrid x:Name="TicketsGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" 
+                  Background="#1A1A1A" Foreground="White" BorderThickness="0" RowBackground="#1A1A1A" 
+                  AlternatingRowBackground="#141414" GridLinesVisibility="Horizontal" 
+                  HorizontalGridLinesBrush="#333333" HeadersVisibility="Column"
+                  SelectionChanged="TicketsGrid_SelectionChanged">
+            <DataGrid.Resources>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#111111"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Padding" Value="10,5"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Номер" Binding="{Binding Id}" Width="80"/>
+                <DataGridTextColumn Header="Дата" Binding="{Binding CreatedAt, StringFormat=\{0:dd.MM.yyyy HH:mm\}}" Width="130"/>
+                <DataGridTextColumn Header="Причина" Binding="{Binding Reason}" Width="150"/>
+                <DataGridTextColumn Header="Сообщение" Binding="{Binding Message}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            <Setter Property="MaxHeight" Value="20"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="100"/>
+                <DataGridTemplateColumn Header="Действие" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button x:Name="BtnDeleteTicket" Content="Удалить" Background="#E50914" Foreground="White" BorderThickness="0" Padding="8,4" Cursor="Hand" Tag="{Binding Id}" Click="BtnDeleteTicket_Click"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Панель ответа -->
+        <Border Grid.Row="2" Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,20,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Текст обращения:" Foreground="#AAAAAA" Margin="0,0,0,5"/>
+                <TextBlock x:Name="TxtSelectedMessage" Grid.Row="1" Grid.ColumnSpan="2" Text="Выберите обращение из списка" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,15" FontSize="14" MaxHeight="100"/>
+
+                <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,20,0">
+                    <TextBlock Text="Ваш ответ:" Foreground="#AAAAAA" Margin="0,0,0,5"/>
+                    <TextBox x:Name="TxtAdminReply" Height="80" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Background="#2A2A2A" Foreground="White" BorderBrush="#444444" Padding="10"/>
+                </StackPanel>
+
+                <Button x:Name="BtnSubmitReply" Grid.Row="2" Grid.Column="1" Content="Ответить и закрыть" Background="#28A745" Foreground="White" FontWeight="Bold" Padding="20,0" Cursor="Hand" VerticalAlignment="Bottom" Height="80" Click="BtnSubmitReply_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>
