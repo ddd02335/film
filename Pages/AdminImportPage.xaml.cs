@@ -1,4 +1,4 @@
-// pages/adminimportpage.xaml.cs импорт фильмов из кинопоиска с выводом лога
+// логика импорта фильмов и вывод лога
 using System.Windows;
 using System.Windows.Controls;
 using MovieApp.Services.Kinopoisk;
