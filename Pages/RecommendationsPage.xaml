@@ -193,7 +193,7 @@
                                                     <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
 
-                                                <!-- постер: заглушка 🎬 + кэшированное изображение из LocalPosterPath -->
+                                                <!-- постер: заглушка с иконкой + кэшированное изображение из LocalPosterPath -->
                                                 <Border Grid.Row="0" CornerRadius="8,8,0,0" ClipToBounds="True">
                                                     <Grid>
                                                         <!-- заглушка: видна пока LocalPosterPath пуст -->

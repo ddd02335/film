@@ -27,11 +27,13 @@ namespace MovieApp.Pages
         private readonly int _currentUserId;
         private bool _isLoadingParentalControl;
         private bool _isLoadingPrivacy;
+        private readonly System.Collections.ObjectModel.ObservableCollection<RatingDisplayItem> _watchedMovies = new();
 
         public ProfilePage(int currentUserId)
         {
             InitializeComponent();
             _currentUserId = currentUserId;
+            LvWatchedMovies.ItemsSource = _watchedMovies;
             Loaded += ProfilePage_Loaded;
         }
 
@@ -334,6 +336,8 @@ namespace MovieApp.Pages
         {
             try
             {
+                _watchedMovies.Clear();
+
                 await using var context = new ApplicationDbContext();
 
                 var user = await context.Users
@@ -386,7 +390,11 @@ namespace MovieApp.Pages
                         PersonalNote = string.IsNullOrWhiteSpace(r.PersonalNote) ? "" : r.PersonalNote
                     }).ToList();
 
-                    LvWatchedMovies.ItemsSource = watchedItems;
+                    foreach (var item in watchedItems)
+                    {
+                        _watchedMovies.Add(item);
+                    }
+
                     TxtNoRatings.Visibility = Visibility.Collapsed;
                     LvWatchedMovies.Visibility = Visibility.Visible;
                 }
@@ -396,7 +404,6 @@ namespace MovieApp.Pages
                     TxtAverageScore.Text = "0.0";
                     TxtFavoriteGenre.Text = "Нет данных";
 
-                    LvWatchedMovies.ItemsSource = null;
                     TxtNoRatings.Visibility = Visibility.Visible;
                     LvWatchedMovies.Visibility = Visibility.Collapsed;
                 }
@@ -404,6 +411,42 @@ namespace MovieApp.Pages
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при загрузке профиля: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void BtnDeleteRating_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button button) return;
+            if (button.DataContext is not RatingDisplayItem item) return;
+
+            if (MessageBox.Show($"Вы уверены, что хотите удалить оценку фильма \"{item.MovieTitle}\" и связанный с ней отзыв?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                await using var db = new ApplicationDbContext();
+
+                var rating = await db.Ratings.FirstOrDefaultAsync(r => r.UserId == _currentUserId && r.MovieId == item.MovieId);
+                if (rating != null)
+                {
+                    db.Ratings.Remove(rating);
+                }
+
+                var comment = await db.Comments.FirstOrDefaultAsync(c => c.UserId == _currentUserId && c.MovieId == item.MovieId);
+                if (comment != null)
+                {
+                    db.Comments.Remove(comment);
+                }
+
+                await db.SaveChangesAsync();
+
+                await LoadUserProfileAsync();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Произошла ошибка при удалении оценки. Пожалуйста, попробуйте позже.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

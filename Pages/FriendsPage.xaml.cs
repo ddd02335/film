@@ -255,12 +255,14 @@ namespace MovieApp.Pages
                 {
                     req.Status = "Accepted";
                     await db.SaveChangesAsync();
-                    MessageBox.Show("Запрос принят. Теперь вы друзья!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    await LoadAllSocialDataAsync();
-                    if (Application.Current.MainWindow is MainWindow mainWindow)
+
+                    if (Application.Current.Windows.OfType<MainWindow>().FirstOrDefault() is MainWindow mainWindow)
                     {
                         await mainWindow.CheckNotificationsAsync();
                     }
+
+                    MessageBox.Show("Запрос принят. Теперь вы друзья!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await LoadAllSocialDataAsync();
                 }
             }
             catch (Exception ex)
@@ -281,11 +283,13 @@ namespace MovieApp.Pages
                 {
                     db.Friendships.Remove(req);
                     await db.SaveChangesAsync();
-                    await LoadRequestsAsync();
-                    if (Application.Current.MainWindow is MainWindow mainWindow)
+
+                    if (Application.Current.Windows.OfType<MainWindow>().FirstOrDefault() is MainWindow mainWindow)
                     {
                         await mainWindow.CheckNotificationsAsync();
                     }
+
+                    await LoadRequestsAsync();
                 }
             }
             catch (Exception ex)
@@ -418,11 +422,13 @@ namespace MovieApp.Pages
                 {
                     notif.IsRead = true;
                     await db.SaveChangesAsync();
-                    await LoadNotificationsAsync();
-                    if (Application.Current.MainWindow is MainWindow mainWindow)
+
+                    if (Application.Current.Windows.OfType<MainWindow>().FirstOrDefault() is MainWindow mainWindow)
                     {
                         await mainWindow.CheckNotificationsAsync();
                     }
+
+                    await LoadNotificationsAsync();
                 }
             }
             catch (Exception ex)
@@ -444,6 +450,11 @@ namespace MovieApp.Pages
                     notif.IsRead = true;
                     await db.SaveChangesAsync();
 
+                    if (Application.Current.Windows.OfType<MainWindow>().FirstOrDefault() is MainWindow mainWindow)
+                    {
+                        await mainWindow.CheckNotificationsAsync();
+                    }
+
                     if (notif.MovieId.HasValue)
                     {
                         var detailsWin = new MovieDetailsWindow(notif.MovieId.Value, _currentUserId);
@@ -452,10 +463,6 @@ namespace MovieApp.Pages
                     }
 
                     await LoadNotificationsAsync();
-                    if (Application.Current.MainWindow is MainWindow mainWindow)
-                    {
-                        await mainWindow.CheckNotificationsAsync();
-                    }
                 }
             }
             catch (Exception ex)
@@ -507,12 +514,13 @@ namespace MovieApp.Pages
                 notif.IsRead = true;
                 await db.SaveChangesAsync();
 
-                MessageBox.Show($"Оценки успешно скопированы! Импортировано новых оценок: {imported}.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                await LoadNotificationsAsync();
-                if (Application.Current.MainWindow is MainWindow mainWindow)
+                if (Application.Current.Windows.OfType<MainWindow>().FirstOrDefault() is MainWindow mainWindow)
                 {
                     await mainWindow.CheckNotificationsAsync();
                 }
+
+                MessageBox.Show($"Оценки успешно скопированы! Импортировано новых оценок: {imported}.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                await LoadNotificationsAsync();
             }
             catch (Exception ex)
             {
@@ -560,11 +568,13 @@ namespace MovieApp.Pages
                 {
                     db.Notifications.Remove(notif);
                     await db.SaveChangesAsync();
-                    await LoadNotificationsAsync();
-                    if (Application.Current.MainWindow is MainWindow mainWindow)
+
+                    if (Application.Current.Windows.OfType<MainWindow>().FirstOrDefault() is MainWindow mainWindow)
                     {
                         await mainWindow.CheckNotificationsAsync();
                     }
+
+                    await LoadNotificationsAsync();
                 }
             }
             catch (Exception)

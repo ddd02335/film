@@ -129,6 +129,7 @@
                         <ColumnDefinition Width="250"/>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="100"/>
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0"
@@ -149,6 +150,14 @@
 
                     <TextBlock Grid.Column="2"
                                Text="Заметки"
+                               Foreground="#AAAAAA"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Padding="10,10,10,10"
+                               VerticalAlignment="Center"/>
+
+                    <TextBlock Grid.Column="3"
+                               Text="Действие"
                                Foreground="#AAAAAA"
                                FontSize="14"
                                FontWeight="SemiBold"
@@ -198,6 +207,8 @@
                                     <ColumnDefinition Width="120"/>
                                     <!-- Колонка 2: Заметка — растягивается на всё оставшееся место -->
                                     <ColumnDefinition Width="*"/>
+                                    <!-- Колонка 3: Кнопка удаления -->
+                                    <ColumnDefinition Width="100"/>
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Column="0"
@@ -230,6 +241,20 @@
                                          HorizontalAlignment="Stretch"
                                          Margin="0,2,4,2"
                                          LostFocus="NoteTextBox_LostFocus"/>
+
+                                <Button Grid.Column="3"
+                                        Content="Удалить"
+                                        Style="{x:Null}"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        FontWeight="Bold"
+                                        Foreground="#E50914"
+                                        Padding="10,8"
+                                        Cursor="Hand"
+                                        FontSize="14"
+                                        Click="BtnDeleteRating_Click"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"/>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
