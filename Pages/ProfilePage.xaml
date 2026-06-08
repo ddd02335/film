@@ -3,34 +3,34 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       mc:Ignorable="d" 
-      d:DesignHeight="600" d:DesignWidth="800"
+      d:DesignHeight="700" d:DesignWidth="800"
       Title="Профиль пользователя"
       Background="#141414">
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Верхняя секция: Аватар и Логин -->
-        <StackPanel Grid.Row="0" Margin="40,40,40,20" Orientation="Horizontal" VerticalAlignment="Center">
+        <StackPanel Grid.Row="0" Margin="40,30,40,10" Orientation="Horizontal" VerticalAlignment="Center">
             
             <!-- Блок аватара -->
             <StackPanel>
-                <Grid Width="100" Height="100">
-                    <!-- Заглушка (фон с буквой) -->
+                <Grid Width="80" Height="80">
                     <Ellipse x:Name="AvatarFallbackBackground" Fill="{StaticResource AccentRed}" />
                     <TextBlock x:Name="TxtAvatarLetter"
                                Text="?"
-                               FontSize="48"
+                               FontSize="36"
                                FontWeight="Bold"
                                Foreground="White"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"/>
-                               
-                    <!-- Загруженное изображение аватара -->
                     <Ellipse>
                         <Ellipse.Fill>
                             <ImageBrush x:Name="AvatarBrush" Stretch="UniformToFill"/>
@@ -38,10 +38,10 @@
                     </Ellipse>
                 </Grid>
                 
-                <!-- Кнопка изменения фото -->
                 <Button Content="Изменить фото"
-                        Margin="0,10,0,0"
-                        Padding="10,5"
+                        Margin="0,6,0,0"
+                        Padding="8,4"
+                        FontSize="11"
                         Background="#2A2A2A"
                         Foreground="White"
                         BorderThickness="1"
@@ -50,40 +50,191 @@
                         Click="BtnChangeAvatar_Click"/>
             </StackPanel>
             
-            <TextBlock x:Name="TxtLogin"
-                       Text="Загрузка..."
-                       FontSize="36"
-                       FontWeight="SemiBold"
-                       Foreground="{StaticResource TextPrimary}"
-                       Margin="24,0,0,0"
-                       VerticalAlignment="Center"/>
+            <StackPanel Margin="20,0,0,0" VerticalAlignment="Center">
+                <TextBlock x:Name="TxtLogin"
+                           Text="Загрузка..."
+                           FontSize="30"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextPrimary}"/>
+
+                <!-- Панель: Настройки -->
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <CheckBox x:Name="ChkParentalControl"
+                              Foreground="White"
+                              FontSize="13"
+                              VerticalContentAlignment="Center"
+                              Checked="ChkParentalControl_Checked"
+                              Unchecked="ChkParentalControl_Unchecked"
+                              Margin="0,0,20,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="Lock" Width="13" Height="13" Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBlock Text="Детский режим" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </CheckBox>
+                    <CheckBox x:Name="ChkPrivateProfile"
+                              Foreground="White"
+                              FontSize="13"
+                              VerticalContentAlignment="Center"
+                              Checked="ChkPrivateProfile_Checked"
+                              Unchecked="ChkPrivateProfile_Unchecked"
+                              Margin="0,0,20,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="EyeOff" Width="13" Height="13" Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBlock Text="Сделать профиль приватным (скрыть из поиска)" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </CheckBox>
+                </StackPanel>
+            </StackPanel>
         </StackPanel>
 
         <!-- Секция статистики -->
-        <UniformGrid Grid.Row="1" Columns="3" Margin="30,0,30,40" VerticalAlignment="Top">
-            <!-- Карточка: Оценено фильмов -->
-            <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="20" Margin="10">
+        <UniformGrid Grid.Row="1" Columns="3" Margin="30,0,30,6" VerticalAlignment="Top">
+            <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="14" Margin="8">
                 <StackPanel>
-                    <TextBlock Text="Оценено фильмов" FontSize="16" Foreground="{StaticResource TextMuted}" Margin="0,0,0,8"/>
-                    <TextBlock x:Name="TxtTotalRated" Text="0" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="Оценено фильмов" FontSize="14" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
+                    <TextBlock x:Name="TxtTotalRated" Text="0" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
             </Border>
-
-            <!-- Карточка: Средняя оценка -->
-            <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="20" Margin="10">
+            <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="14" Margin="8">
                 <StackPanel>
-                    <TextBlock Text="Средняя оценка" FontSize="16" Foreground="{StaticResource TextMuted}" Margin="0,0,0,8"/>
-                    <TextBlock x:Name="TxtAverageScore" Text="0.0" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="Средняя оценка" FontSize="14" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
+                    <TextBlock x:Name="TxtAverageScore" Text="0.0" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
             </Border>
-
-            <!-- Карточка: Любимый жанр -->
-            <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="20" Margin="10">
+            <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="14" Margin="8">
                 <StackPanel>
-                    <TextBlock Text="Любимый жанр" FontSize="16" Foreground="{StaticResource TextMuted}" Margin="0,0,0,8"/>
-                    <TextBlock x:Name="TxtFavoriteGenre" Text="Нет данных" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="Любимый жанр" FontSize="14" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
+                    <TextBlock x:Name="TxtFavoriteGenre" Text="Нет данных" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
             </Border>
         </UniformGrid>
+
+        <!-- Заголовок секции просмотренных -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="42,6,40,6">
+            <iconPacks:PackIconMaterial Kind="ClipboardList" Width="16" Height="16" Foreground="White" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <TextBlock Text="Просмотренные фильмы" FontSize="16" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Секция: Просмотренные фильмы (история оценок) -->
+        <Border Grid.Row="3" Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Margin="40,0,40,20" Padding="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Заголовки таблицы -->
+                <Grid Grid.Row="0" Background="#252525" Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="250"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="Фильм"
+                               Foreground="#AAAAAA"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Padding="10,10,10,10"
+                               VerticalAlignment="Center"/>
+
+                    <TextBlock Grid.Column="1"
+                               Text="Оценка"
+                               Foreground="#AAAAAA"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Padding="10,10,10,10"
+                               VerticalAlignment="Center"/>
+
+                    <TextBlock Grid.Column="2"
+                               Text="Заметки"
+                               Foreground="#AAAAAA"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Padding="10,10,10,10"
+                               VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- Сообщение, если нет оценок -->
+                <TextBlock x:Name="TxtNoRatings"
+                           Grid.Row="1"
+                           Text="Вы ещё не оценили ни одного фильма."
+                           Foreground="#CCCCCC"
+                           FontSize="16"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Visibility="Collapsed"/>
+
+                <ListView x:Name="LvWatchedMovies"
+                          Grid.Row="1"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          Foreground="White"
+                          HorizontalAlignment="Stretch"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListView.Resources>
+                        <!-- Цвет выделения строки: тёмный тинт + белый текст -->
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#2A2A2A"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#2A2A2A"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"/>
+                    </ListView.Resources>
+                    <!-- Растягиваем каждый элемент на всю ширину -->
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <!-- Колонка 0: Название фильма -->
+                                    <ColumnDefinition Width="250"/>
+                                    <!-- Колонка 1: Оценка -->
+                                    <ColumnDefinition Width="120"/>
+                                    <!-- Колонка 2: Заметка — растягивается на всё оставшееся место -->
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding MovieTitle}"
+                                           Foreground="White"
+                                           FontSize="15"
+                                           Padding="10,8"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding ScoreDisplay}"
+                                           Foreground="White"
+                                           FontSize="15"
+                                           Padding="10,8"
+                                           VerticalAlignment="Center"/>
+
+                                <TextBox Grid.Column="2"
+                                         Text="{Binding PersonalNote, Mode=OneWay}"
+                                         Background="#2A2A2A"
+                                         Foreground="White"
+                                         CaretBrush="White"
+                                         BorderBrush="#444444"
+                                         BorderThickness="1"
+                                         Padding="6,4"
+                                         FontSize="15"
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="False"
+                                         MaxLength="500"
+                                         HorizontalAlignment="Stretch"
+                                         Margin="0,2,4,2"
+                                         LostFocus="NoteTextBox_LostFocus"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Border>
     </Grid>
 </Page>

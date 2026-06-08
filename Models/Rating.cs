@@ -10,6 +10,9 @@ namespace MovieApp.Models
         // оценка от 1 до 5 (ограничение задаётся через fluent api)
         public int Score { get; set; }
 
+        // личная заметка пользователя о фильме
+        public string? PersonalNote { get; set; }
+
         // навигационные свойства
         public User User { get; set; } = null!;
         public Movie Movie { get; set; } = null!;

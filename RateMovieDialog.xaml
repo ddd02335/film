@@ -2,22 +2,33 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Оценить фильм"
-        Height="260" Width="360"
+        Height="480" Width="400"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         Background="#1F1F1F">
 
-    <StackPanel Margin="32">
-        <TextBlock Text="Ваша оценка" Foreground="#B3B3B3" FontSize="12" Margin="0,0,0,6"/>
+    <Grid Margin="32">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Ваша оценка" Foreground="#B3B3B3" FontSize="12" Margin="0,0,0,6"/>
         <TextBlock x:Name="TxtMovieName"
+                   Grid.Row="1"
                    Text=""
                    FontSize="15" FontWeight="SemiBold"
                    Foreground="#FFFFFF"
                    TextWrapping="Wrap"
-                   Margin="0,0,0,20"/>
+                   Margin="0,0,0,16"/>
 
         <!-- звёзды выбора оценки -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,24">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,12">
             <Button x:Name="Star1" Content="★" FontSize="28" Tag="1" Style="{StaticResource StarButtonStyle}" Click="Star_Click"/>
             <Button x:Name="Star2" Content="★" FontSize="28" Tag="2" Style="{StaticResource StarButtonStyle}" Click="Star_Click"/>
             <Button x:Name="Star3" Content="★" FontSize="28" Tag="3" Style="{StaticResource StarButtonStyle}" Click="Star_Click"/>
@@ -26,17 +37,39 @@
         </StackPanel>
 
         <TextBlock x:Name="TxtSelected"
+                   Grid.Row="3"
                    Text="Выберите оценку"
                    Foreground="#6B6B6B"
                    FontSize="13"
                    HorizontalAlignment="Center"
-                   Margin="0,0,0,20"/>
+                   Margin="0,0,0,14"/>
+
+        <!-- Личная заметка -->
+        <TextBlock Grid.Row="4" Text="Личная заметка (необязательно):" Foreground="#B3B3B3" FontSize="12" Margin="0,0,0,6"/>
+        <TextBox x:Name="TxtPersonalNote"
+                 Grid.Row="5"
+                 Background="#2A2A2A"
+                 Foreground="White"
+                 CaretBrush="White"
+                 BorderBrush="#444444"
+                 BorderThickness="1"
+                 Padding="8"
+                 MinHeight="60"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 MaxLength="500"
+                 IsReadOnly="False"
+                 IsEnabled="True"
+                 Focusable="True"
+                 VerticalScrollBarVisibility="Auto"
+                 Margin="0,0,0,16"/>
 
         <Button x:Name="BtnSave"
+                Grid.Row="6"
                 Content="Сохранить оценку"
                 Style="{StaticResource PrimaryButtonStyle}"
                 Height="40"
                 Click="BtnSave_Click"
                 IsEnabled="False"/>
-    </StackPanel>
+    </Grid>
 </Window>

@@ -30,6 +30,7 @@ namespace MovieApp
             if (existing != null)
             {
                 SetScore(existing.Score);
+                TxtPersonalNote.Text = existing.PersonalNote ?? string.Empty;
             }
         }
 
@@ -71,10 +72,23 @@ namespace MovieApp
             using var db = new ApplicationDbContext();
             var existing = db.Ratings.FirstOrDefault(r => r.UserId == _userId && r.MovieId == _movieId);
 
+            string? note = string.IsNullOrWhiteSpace(TxtPersonalNote.Text) ? null : TxtPersonalNote.Text.Trim();
+
             if (existing != null)
+            {
                 existing.Score = _selectedScore;
+                existing.PersonalNote = note;
+            }
             else
-                db.Ratings.Add(new Rating { UserId = _userId, MovieId = _movieId, Score = _selectedScore });
+            {
+                db.Ratings.Add(new Rating
+                {
+                    UserId = _userId,
+                    MovieId = _movieId,
+                    Score = _selectedScore,
+                    PersonalNote = note
+                });
+            }
 
             await db.SaveChangesAsync();
             Close();

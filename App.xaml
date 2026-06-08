@@ -4,6 +4,12 @@
              xmlns:local="clr-namespace:MovieApp"
              DispatcherUnhandledException="Application_DispatcherUnhandledException">
     <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Red.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
         <!-- конвертер bool → Visibility (True=Visible, False=Collapsed) -->
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
@@ -13,6 +19,9 @@
 
         <!-- конвертер bool → Style для кнопки номера страницы (активная/обычная) -->
         <local:BoolToPageButtonStyleConverter x:Key="BoolToPageButtonStyleConverter"/>
+
+        <!-- конвертер base64 → ImageSource для аватарок -->
+        <local:Base64ToImageConverter x:Key="Base64ToImageConverter"/>
 
         <!-- =============================================
              цветовая палитра — "тёмная кинотека"
@@ -390,5 +399,6 @@
             </Setter>
         </Style>
 
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

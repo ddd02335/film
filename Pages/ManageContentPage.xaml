@@ -119,8 +119,8 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <Button Content="Изменить" Width="80" Background="#0078D7" Foreground="White" BorderThickness="0" Padding="5" Margin="0,0,5,0" Cursor="Hand" Tag="{Binding Id}" Click="BtnEdit_Click"/>
-                                        <Button Content="Удалить" Width="80" Background="#E50914" Foreground="White" BorderThickness="0" Padding="5" Cursor="Hand" Tag="{Binding Id}" Click="BtnDelete_Click"/>
+                                        <Button Content="Изменить" Width="Auto" Background="#0078D7" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,5,0" Cursor="Hand" Tag="{Binding Id}" Click="BtnEdit_Click"/>
+                                        <Button Content="Удалить" Width="Auto" Background="#E50914" Foreground="White" BorderThickness="0" Padding="10,5" Cursor="Hand" Tag="{Binding Id}" Click="BtnDelete_Click"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

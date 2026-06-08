@@ -99,6 +99,7 @@ namespace MovieApp.Services.Kinopoisk
                             Type      = film.Type
                         };
 
+                        bool isValid = false;
                         try
                         {
                             var detailUrl = $"/api/v2.2/films/{film.KinopoiskId}";
@@ -110,12 +111,29 @@ namespace MovieApp.Services.Kinopoisk
                                 {
                                     movie.Description = det.Description;
                                     movie.RatingKinopoisk = det.RatingKinopoisk;
-                                    movie.AgeRating = (det.RatingAgeLimits?.ToString().Replace("age", "").Replace("+", "") ?? "12") + "+";
+                                    movie.AgeRating = det.RatingAgeLimits != null 
+                                        ? (det.RatingAgeLimits.Replace("age", "").Replace("+", "") + "+")
+                                        : null;
+
+                                    if (!string.IsNullOrWhiteSpace(movie.Description) &&
+                                        !string.IsNullOrWhiteSpace(movie.PosterUrl) &&
+                                        !string.IsNullOrWhiteSpace(det.RatingAgeLimits) &&
+                                        movie.RatingKinopoisk != null &&
+                                        movie.RatingKinopoisk > 0)
+                                    {
+                                        isValid = true;
+                                    }
                                 }
                             }
                             await Task.Delay(150);
                         }
-                        catch { /* детали не критичны */ }
+                        catch { }
+
+                        if (!isValid)
+                        {
+                            skippedCount++;
+                            continue;
+                        }
 
                         db.Movies.Add(movie);
                         existingMovieIds.Add(film.KinopoiskId);

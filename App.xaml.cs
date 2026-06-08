@@ -8,9 +8,39 @@ namespace MovieApp
 {
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            // режим обслуживания: dotnet run -- --maintenance
+            if (e.Args.Contains("--maintenance"))
+            {
+                try
+                {
+                    await MovieApp.Tools.MovieMaintenance.RunAsync();
+                }
+                catch (System.Exception ex)
+                {
+                    System.Console.WriteLine($"ОШИБКА: {ex.Message}");
+                }
+                Shutdown();
+                return;
+            }
+
+            // режим финального наполнения: dotnet run -- --final-seed
+            if (e.Args.Contains("--final-seed"))
+            {
+                try
+                {
+                    await MovieApp.Tools.MovieMaintenance.FinalSeedDatabaseAsync();
+                }
+                catch (System.Exception ex)
+                {
+                    System.Console.WriteLine($"ОШИБКА: {ex.Message}");
+                }
+                Shutdown();
+                return;
+            }
 
             try
             {
@@ -22,6 +52,15 @@ namespace MovieApp
                     // безопасное добавление колонок reason и adminreply (если их нет)
                     try { db.Database.ExecuteSqlRaw("ALTER TABLE SupportTickets ADD COLUMN Reason TEXT DEFAULT 'Другое';"); } catch { }
                     try { db.Database.ExecuteSqlRaw("ALTER TABLE SupportTickets ADD COLUMN AdminReply TEXT;"); } catch { }
+
+                    // безопасное добавление колонки родительского контроля
+                    try { db.Database.ExecuteSqlRaw("ALTER TABLE Users ADD COLUMN IsParentalControlEnabled INTEGER NOT NULL DEFAULT 0;"); } catch { }
+
+                    // безопасное добавление колонки личной заметки к оценке
+                    try { db.Database.ExecuteSqlRaw("ALTER TABLE Ratings ADD COLUMN PersonalNote TEXT;"); } catch { }
+
+                    // безопасное добавление колонки мягкого удаления
+                    try { db.Database.ExecuteSqlRaw("ALTER TABLE Users ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0;"); } catch { }
 
                     // если пользователей нет (новая бд) создаём дефолтных
                     if (!db.Users.Any())

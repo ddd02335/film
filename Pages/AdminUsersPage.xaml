@@ -3,15 +3,19 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       mc:Ignorable="d" 
-      d:DesignHeight="600" d:DesignWidth="800"
+      d:DesignHeight="900" d:DesignWidth="900"
       Title="Управление пользователями"
       Background="#141414">
 
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <Grid Margin="30">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -23,9 +27,46 @@
                      LostFocus="TxtSearchUser_LostFocus" Text="Поиск по логину..."/>
         </StackPanel>
 
-        <!-- Таблица пользователей -->
+        <!-- Dashboard Panel -->
+        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,20">
+            <!-- Total Users Card -->
+            <Border Background="#1F1F1F" CornerRadius="8" Padding="15" Margin="0,0,8,0" BorderBrush="#2A2A2A" BorderThickness="1">
+                <StackPanel Orientation="Horizontal">
+                    <iconPacks:PackIconMaterial Kind="AccountMultiple" Width="32" Height="32" Foreground="#E50914" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock x:Name="TxtStatsTotalUsers" Text="0" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Всего пользователей" FontSize="11" Foreground="#6B6B6B" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Total Ratings Card -->
+            <Border Background="#1F1F1F" CornerRadius="8" Padding="15" Margin="4,0,4,0" BorderBrush="#2A2A2A" BorderThickness="1">
+                <StackPanel Orientation="Horizontal">
+                    <iconPacks:PackIconMaterial Kind="Star" Width="32" Height="32" Foreground="#FFA500" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock x:Name="TxtStatsTotalRatings" Text="0" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Всего оценок" FontSize="11" Foreground="#6B6B6B" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Total Comments Card -->
+            <Border Background="#1F1F1F" CornerRadius="8" Padding="15" Margin="8,0,0,0" BorderBrush="#2A2A2A" BorderThickness="1">
+                <StackPanel Orientation="Horizontal">
+                    <iconPacks:PackIconMaterial Kind="Comment" Width="32" Height="32" Foreground="#0078D7" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock x:Name="TxtStatsTotalComments" Text="0" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Всего комментариев" FontSize="11" Foreground="#6B6B6B" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Таблица активных пользователей -->
         <DataGrid x:Name="UsersGrid"
-                  Grid.Row="1"
+                  Grid.Row="2"
+                  Height="350"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   SelectionMode="Single"
@@ -41,7 +82,6 @@
             
             <!-- Стили DataGrid для темной темы -->
             <DataGrid.Resources>
-                <!-- Заголовки столбцов -->
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="Background" Value="#111111"/>
                     <Setter Property="Foreground" Value="White"/>
@@ -50,8 +90,6 @@
                     <Setter Property="BorderThickness" Value="0,0,0,1"/>
                     <Setter Property="BorderBrush" Value="#333333"/>
                 </Style>
-                
-                <!-- Строки -->
                 <Style TargetType="DataGridRow">
                     <Setter Property="Background" Value="#1A1A1A"/>
                     <Setter Property="Foreground" Value="White"/>
@@ -62,8 +100,6 @@
                         </Trigger>
                     </Style.Triggers>
                 </Style>
-                
-                <!-- Ячейки -->
                 <Style TargetType="DataGridCell">
                     <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                     <Setter Property="BorderThickness" Value="0"/>
@@ -94,12 +130,14 @@
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                 <DataGridTextColumn Header="Логин" Binding="{Binding Login}" Width="*"/>
                 <DataGridTextColumn Header="Пароль" Binding="{Binding Password}" Width="*"/>
-                <DataGridTextColumn Header="Роль" Binding="{Binding Role}" Width="150"/>
+                <DataGridTextColumn Header="Роль" Binding="{Binding Role}" Width="120"/>
+                <DataGridCheckBoxColumn Header="Род. контроль" Binding="{Binding IsParentalControlEnabled}" Width="120" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
 
         <!-- Панель управления (редактирование и добавление) -->
-        <StackPanel Grid.Row="2" Margin="0,20,0,0">
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" Margin="0,15,0,0">
+        <StackPanel>
             <!-- Редактирование выбранного пользователя -->
             <Border Background="#1A1A1A"
                     BorderBrush="#333333"
@@ -130,10 +168,46 @@
                             </ComboBox>
                         </StackPanel>
 
-                        <Button x:Name="BtnSave" Content="Сохранить" Padding="20,8" Cursor="Hand" Click="BtnSave_Click" VerticalAlignment="Bottom" Margin="0,0,0,5">
+                        <!-- Чекбокс родительского контроля -->
+                        <StackPanel Margin="0,0,15,5" VerticalAlignment="Bottom">
+                            <CheckBox x:Name="ChkParentalControl" 
+                                      Content="Родительский контроль" 
+                                      Foreground="White" 
+                                      FontSize="12"
+                                      VerticalContentAlignment="Center"
+                                      Margin="0,0,0,5"/>
+                        </StackPanel>
+
+                        <Button x:Name="BtnSave" Content="Сохранить" Padding="20,8" Cursor="Hand" Click="BtnSave_Click" VerticalAlignment="Bottom" Margin="0,0,10,5">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Background" Value="#E50914"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="4">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Background" Value="#555555"/>
+                                            <Setter Property="Foreground" Value="#AAAAAA"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <!-- Кнопка архивации пользователя -->
+                        <Button x:Name="BtnDeleteUser" Content="Архивировать" Padding="20,8" Cursor="Hand" Click="BtnDeleteUser_Click" VerticalAlignment="Bottom" Margin="0,0,0,5">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Background" Value="#8B0000"/>
                                     <Setter Property="Foreground" Value="White"/>
                                     <Setter Property="BorderThickness" Value="0"/>
                                     <Setter Property="Template">
@@ -192,5 +266,79 @@
                 </StackPanel>
             </Border>
         </StackPanel>
+        </ScrollViewer>
+
+        <!-- Секция архивированных пользователей -->
+        <Border Grid.Row="4" Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,15,0,0">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <iconPacks:PackIconMaterial Kind="Archive" Width="18" Height="18" Foreground="#FF6B6B" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Архивированные аккаунты" FontSize="16" FontWeight="Bold" Foreground="#FF6B6B" VerticalAlignment="Center"/>
+                    <Button x:Name="BtnRestore" Content="Восстановить" Padding="14,6" Cursor="Hand" Click="BtnRestore_Click" Margin="20,0,0,0" VerticalAlignment="Center">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#28A745"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="4">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+                <DataGrid x:Name="ArchivedUsersGrid"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          Background="Transparent"
+                          Foreground="#AAAAAA"
+                          BorderThickness="0"
+                          RowBackground="#1A1A1A"
+                          AlternatingRowBackground="#141414"
+                          GridLinesVisibility="Horizontal"
+                          HorizontalGridLinesBrush="#333333"
+                          HeadersVisibility="Column"
+                          MinHeight="150"
+                          MaxHeight="250">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#111111"/>
+                            <Setter Property="Foreground" Value="#888888"/>
+                            <Setter Property="Padding" Value="10,4"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Padding" Value="10,4"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridCell">
+                                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                        <DataGridTextColumn Header="Логин" Binding="{Binding Login}" Width="*"/>
+                        <DataGridTextColumn Header="Роль" Binding="{Binding Role}" Width="120"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </Border>
     </Grid>
+    </ScrollViewer>
+
 </Page>

@@ -31,6 +31,13 @@ namespace MovieApp.Pages
         private readonly ObservableCollection<PageNumberItem> _pageNumbers = new();
 
         private readonly int _currentUserId;
+        private bool _isParentalControlEnabled;
+
+        // жанры, скрываемые при включённом родительском контроле
+        private static readonly HashSet<string> MatureGenres = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Ужасы", "Триллер", "Криминал", "Эротика"
+        };
 
         // ── http-клиент для кэша постеров (один на всё приложение) ───────────
         private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(15) };
@@ -59,6 +66,10 @@ namespace MovieApp.Pages
 
             await LoadFiltersAsync(db);
 
+            // проверяем состояние родительского контроля для текущего пользователя
+            var currentUser = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == _currentUserId);
+            _isParentalControlEnabled = currentUser?.IsParentalControlEnabled ?? false;
+
             var ratedMovieIds = await db.Ratings
                 .Where(r => r.UserId == _currentUserId)
                 .Select(r => r.MovieId)
@@ -70,6 +81,22 @@ namespace MovieApp.Pages
                 .AsNoTracking()
                 .OrderBy(m => m.Title)
                 .ToListAsync();
+
+            // фильтрация родительского контроля: исключаем 18+ и зрелые жанры
+            if (_isParentalControlEnabled)
+            {
+                movies = movies.Where(m =>
+                {
+                    // исключаем по возрастному рейтингу
+                    if (!string.IsNullOrEmpty(m.AgeRating) && m.AgeRating.Contains("18"))
+                        return false;
+
+                    // исключаем по зрелым жанрам
+                    bool hasMatureGenre = m.MovieGenres
+                        .Any(mg => MatureGenres.Contains(mg.Genre.Name));
+                    return !hasMatureGenre;
+                }).ToList();
+            }
 
             _allMovies = movies.Select(m => new MovieViewModel(m) { IsRated = ratedMovieIds.Contains(m.Id) }).ToList();
 
@@ -345,18 +372,23 @@ namespace MovieApp.Pages
 
             if (sender is not Button btn || btn.Tag is not int movieId) return;
 
-            // блокировка повторной оценки
+            // проверяем, оценивал ли пользователь этот фильм
             try
             {
                 await using var db = new ApplicationDbContext();
                 bool alreadyRated = await db.Ratings.AnyAsync(r => r.UserId == _currentUserId && r.MovieId == movieId);
+
                 if (alreadyRated)
                 {
-                    MessageBox.Show(
-                        "Вы уже оценили этот фильм. Оценку можно удалить во вкладке 'Просмотренные'.",
-                        "Уже оценено",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
+                    // уже оценено → открываем полноценный RateMovieDialog для редактирования оценки и заметки
+                    var movie = await db.Movies.AsNoTracking().FirstOrDefaultAsync(m => m.Id == movieId);
+                    if (movie == null) return;
+
+                    var dialog = new RateMovieDialog(movie.Title, _currentUserId, movieId)
+                    {
+                        Owner = Window.GetWindow(this)
+                    };
+                    dialog.ShowDialog();
                     return;
                 }
             }
@@ -365,7 +397,7 @@ namespace MovieApp.Pages
                 System.Diagnostics.Debug.WriteLine($"[Каталог] Ошибка проверки оценки: {ex.Message}");
             }
 
-            // popup находится в том же родительском grid что и кнопка «оценить»
+            // новая оценка → используем быстрый inline popup со звёздами
             var popup = FindSiblingPopup(btn);
             if (popup == null) return;
 
@@ -458,7 +490,7 @@ namespace MovieApp.Pages
             {
                 await using var db = new ApplicationDbContext();
 
-                var existing = db.Ratings.FirstOrDefault(
+                var existing = await db.Ratings.FirstOrDefaultAsync(
                     r => r.UserId == userId && r.MovieId == movieId);
 
                 if (existing != null)

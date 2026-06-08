@@ -1,0 +1,244 @@
+<Window x:Class="MovieApp.UserProfileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        WindowStartupLocation="CenterOwner"
+        Width="600"
+        Height="550"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+
+    <Window.Resources>
+        <!-- Стиль кнопок -->
+        <Style x:Key="BottomButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Кнопка закрытия окна -->
+        <Style x:Key="CloseButtonStyle" TargetType="Button">
+            <Setter Property="Width"           Value="32"/>
+            <Setter Property="Height"          Value="32"/>
+            <Setter Property="Background"      Value="#2A2A2A"/>
+            <Setter Property="Foreground"      Value="#B3B3B3"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="FontSize"        Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="16"
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E50914"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#C0000D"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="#1A1A1A"
+            CornerRadius="14"
+            MouseDown="OnDragWindow"
+            Margin="12">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000"
+                               BlurRadius="30"
+                               Opacity="0.8"
+                               ShadowDepth="0"/>
+        </Border.Effect>
+
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <!-- Заголовок с аватаром -->
+                <RowDefinition Height="Auto"/>
+                <!-- Блок статистики -->
+                <RowDefinition Height="Auto"/>
+                <!-- Список фильмов -->
+                <RowDefinition Height="*"/>
+                <!-- Кнопка Закрыть -->
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 1. Заголовок с аватаром -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Аватар -->
+                <Grid Grid.Column="0" Width="64" Height="64" Margin="0,0,16,0">
+                    <Ellipse x:Name="ProfileAvatarFallback" Fill="#E50914" 
+                             Visibility="{Binding HasNoAvatar, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    <TextBlock x:Name="ProfileAvatarLetter"
+                               Text="{Binding TargetUserInitials, RelativeSource={RelativeSource AncestorType=Window}}"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding HasNoAvatar, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    <Ellipse x:Name="ProfileAvatarEllipse"
+                             Visibility="{Binding HasAvatar, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Ellipse.Fill>
+                            <ImageBrush ImageSource="{Binding TargetUserAvatarBase64, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource Base64ToImageConverter}}" Stretch="UniformToFill"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </Grid>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock x:Name="TxtLogin" Text="Имя Пользователя" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock Text="Профиль сообщества" FontSize="12" Foreground="#888888" Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <!-- Кнопка закрытия -->
+                <Button Grid.Column="2" Style="{StaticResource CloseButtonStyle}" Click="BtnClose_Click" VerticalAlignment="Top">
+                    <iconPacks:PackIconMaterial Kind="Close" Width="12" Height="12" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" VerticalAlignment="Center"/>
+                </Button>
+            </Grid>
+
+            <!-- 2. Блок статистики -->
+            <Grid x:Name="StatsPanel" Grid.Row="1" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Оценено фильмов -->
+                <Border Grid.Column="0" Background="#111111" CornerRadius="6" BorderBrush="#242424" BorderThickness="1" Margin="0,0,8,0" Padding="12,10">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Оценено" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="TxtWatchedCount" Text="0" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Средняя оценка -->
+                <Border Grid.Column="1" Background="#111111" CornerRadius="6" BorderBrush="#242424" BorderThickness="1" Margin="4,0,4,0" Padding="12,10">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Средняя оценка" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="TxtAverageScore" Text="0.0" FontSize="18" FontWeight="Bold" Foreground="#FFD700" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Любимый жанр -->
+                <Border Grid.Column="2" Background="#111111" CornerRadius="6" BorderBrush="#242424" BorderThickness="1" Margin="8,0,0,0" Padding="12,10">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Любимый жанр" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="TxtFavoriteGenre" Text="—" FontSize="14" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" Margin="0,7,0,0" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- 3. Список фильмов -->
+            <Grid x:Name="MoviesPanel" Grid.Row="2" Margin="0,0,0,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Рецензии и отзывы пользователя" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+                
+                <Border Grid.Row="1" Background="#111111" CornerRadius="8" BorderBrush="#242424" BorderThickness="1" Padding="10">
+                    <Grid>
+                        <TextBlock x:Name="TxtNoMovies" Text="Нет публичных рецензий." Foreground="#666666" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                        <ListView x:Name="LvRatedMovies" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Padding" Value="0,8"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="#242424" BorderThickness="0,0,0,1" Padding="0,0,0,8" Margin="0,0,0,4">
+                                        <StackPanel>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis" MaxWidth="300"/>
+                                                    <TextBlock Text="{Binding Year}" FontSize="12" Foreground="#888888" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                                    <Border Background="#2A2A2A" CornerRadius="4" Padding="5,2" Margin="10,0,0,0">
+                                                        <TextBlock Text="{Binding ScoreText}" FontSize="11" Foreground="#FFD700" FontWeight="Bold"/>
+                                                    </Border>
+                                                </StackPanel>
+                                                
+                                                <TextBlock Grid.Column="1" Text="{Binding CommentDateText}" FontSize="11" Foreground="#666666" VerticalAlignment="Center"/>
+                                            </Grid>
+                                            <TextBlock Text="{Binding CommentText}" FontSize="13" Foreground="#CCCCCC" TextWrapping="Wrap" Margin="0,6,0,0" LineHeight="18"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Сообщение "Пользователь скрыт" -->
+            <TextBlock x:Name="TxtHiddenProfile" 
+                       Text="Пользователь скрыт" 
+                       FontSize="20" 
+                       FontWeight="Bold" 
+                       Foreground="#888888" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center" 
+                       Visibility="Collapsed" 
+                       Grid.Row="1" 
+                       Grid.RowSpan="2"/>
+
+            <!-- 4. Кнопка Закрыть -->
+            <Button Grid.Row="3" Content="Закрыть" Width="120" HorizontalAlignment="Right"
+                    Style="{StaticResource BottomButtonStyle}" Background="#E50914" Click="BtnClose_Click"/>
+        </Grid>
+    </Border>
+</Window>

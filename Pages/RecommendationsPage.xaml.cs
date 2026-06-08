@@ -1,8 +1,9 @@
-// pages/recommendationspage.xaml.cs
-// страница персональных рекомендаций.
-// использует recommendationservice с алгоритмом взвешенной контентной фильтрации.
-using System.IO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,7 +18,7 @@ namespace MovieApp.Pages
     {
         private readonly int _userId;
 
-        // общий http-клиент для кэша постеров (пере-используется)
+        // общий http-клиент для кэша постеров
         private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(15) };
 
         public RecommendationsPage(int userId)
@@ -25,12 +26,25 @@ namespace MovieApp.Pages
             InitializeComponent();
             _userId = userId;
             
-            // подписываемся на loaded, рекомендации пересчитывались
-            // каждый раз при открытии страницы пользователем.
-            Loaded += async (_, _) => await LoadAsync();
+            Loaded += async (_, _) => await LoadAllAsync();
         }
 
-        private async Task LoadAsync()
+        private async Task LoadAllAsync()
+        {
+            await LoadPersonalAsync();
+            await LoadFriendsPopularAsync();
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Можно обновить данные при переключении табов, если необходимо
+        }
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  Таб 1: Персональные рекомендации (Контентный алгоритм)
+        // ══════════════════════════════════════════════════════════════════════
+
+        private async Task LoadPersonalAsync()
         {
             PanelLoading.Visibility   = Visibility.Visible;
             PanelNoRatings.Visibility = Visibility.Collapsed;
@@ -40,41 +54,94 @@ namespace MovieApp.Pages
             List<Movie> movies;
             bool isColdStart;
 
-            await using (var db = new ApplicationDbContext())
+            try
             {
-                int ratingCount = await db.Ratings
-                    .AsNoTracking()
-                    .CountAsync(r => r.UserId == _userId);
+                await using (var db = new ApplicationDbContext())
+                {
+                    int ratingCount = await db.Ratings
+                        .AsNoTracking()
+                        .CountAsync(r => r.UserId == _userId);
 
-                isColdStart = ratingCount < 3;
+                    isColdStart = ratingCount < 3;
 
-                var service = new RecommendationService(db);
-                movies = await service.GetRecommendationsAsync(_userId, limit: 20);
+                    var service = new RecommendationService(db);
+                    movies = await service.GetRecommendationsAsync(_userId, limit: 20);
+                }
+
+                PanelLoading.Visibility = Visibility.Collapsed;
+
+                if (movies.Count == 0)
+                {
+                    PanelNoRatings.Visibility = Visibility.Visible;
+                    return;
+                }
+
+                var items = movies.Select(m => new RecMovieViewModel(m)).ToList();
+                RecPanel.ItemsSource = items;
+
+                TxtCount.Text = isColdStart
+                    ? $"Подобрано для вас: {items.Count} фильм(ов)  ·  режим: топ по рейтингу (добавьте оценки для персонализации)"
+                    : $"Подобрано для вас: {items.Count} фильм(ов)  ·  алгоритм: взвешенная контентная фильтрация";
+                TxtCount.Visibility = Visibility.Visible;
+
+                PosterCacheService.EnsureCacheDirectory();
+                _ = Task.Run(() => PreloadPostersAsync(items));
             }
-
-            PanelLoading.Visibility = Visibility.Collapsed;
-
-            if (movies.Count == 0)
+            catch (Exception ex)
             {
-                PanelNoRatings.Visibility = Visibility.Visible;
-                return;
+                PanelLoading.Visibility = Visibility.Collapsed;
+                System.Diagnostics.Debug.WriteLine($"[Рекомендации] Ошибка: {ex.Message}");
             }
-
-            // формируем viewmodel для привязки карточек
-            var items = movies.Select(m => new RecMovieViewModel(m)).ToList();
-            RecPanel.ItemsSource = items;
-
-            // счётчик с пояснением режима
-            TxtCount.Text = isColdStart
-                ? $"Подобрано для вас: {items.Count} фильм(ов)  ·  режим: топ по рейтингу (добавьте оценки для персонализации)"
-                : $"Подобрано для вас: {items.Count} фильм(ов)  ·  алгоритм: взвешенная контентная фильтрация";
-            TxtCount.Visibility = Visibility.Visible;
-
-            // загружаем постеры в фоне, не блокируя ui
-            PosterCacheService.EnsureCacheDirectory();
-            _ = Task.Run(() => PreloadPostersAsync(items));
         }
 
+        // ══════════════════════════════════════════════════════════════════════
+        //  Таб 2: Популярное у друзей (Коллаборативный подход)
+        // ══════════════════════════════════════════════════════════════════════
+
+        private async Task LoadFriendsPopularAsync()
+        {
+            PanelFriendsPopularLoading.Visibility = Visibility.Visible;
+            PanelNoFriendsPopular.Visibility = Visibility.Collapsed;
+            TxtFriendsPopularCount.Visibility = Visibility.Collapsed;
+            FriendsPopularPanel.ItemsSource = null;
+
+            List<Movie> movies;
+
+            try
+            {
+                await using (var db = new ApplicationDbContext())
+                {
+                    var service = new RecommendationService(db);
+                    movies = await service.GetFriendsPopularRecommendationsAsync(_userId, limit: 20);
+                }
+
+                PanelFriendsPopularLoading.Visibility = Visibility.Collapsed;
+
+                if (movies.Count == 0)
+                {
+                    PanelNoFriendsPopular.Visibility = Visibility.Visible;
+                    return;
+                }
+
+                var items = movies.Select(m => new RecMovieViewModel(m)).ToList();
+                FriendsPopularPanel.ItemsSource = items;
+
+                TxtFriendsPopularCount.Text = $"Найдено рекомендаций от друзей: {items.Count} фильм(ов)";
+                TxtFriendsPopularCount.Visibility = Visibility.Visible;
+
+                PosterCacheService.EnsureCacheDirectory();
+                _ = Task.Run(() => PreloadPostersAsync(items));
+            }
+            catch (Exception ex)
+            {
+                PanelFriendsPopularLoading.Visibility = Visibility.Collapsed;
+                System.Diagnostics.Debug.WriteLine($"[Рекомендации Друзей] Ошибка: {ex.Message}");
+            }
+        }
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  Вспомогательные методы
+        // ══════════════════════════════════════════════════════════════════════
 
         private async Task PreloadPostersAsync(IReadOnlyList<RecMovieViewModel> items)
         {
@@ -93,14 +160,12 @@ namespace MovieApp.Pages
                         if (localPath != null)
                             await Dispatcher.InvokeAsync(() => movie.SetLocalPath(localPath));
                     }
-                    catch { /* постер недоступен — оставляем заглушку 🎬 */ }
+                    catch { /* постер недоступен — оставляем заглушку */ }
                     finally { semaphore.Release(); }
                 });
 
             await Task.WhenAll(tasks);
         }
-
-        // ── клик по карточке рекомендации ─────────────────────────────────────
 
         private async void OnMovieCardClicked(object sender, MouseButtonEventArgs e)
         {
@@ -127,8 +192,7 @@ namespace MovieApp.Pages
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(
-                    $"[Рекомендации] Ошибка загрузки деталей: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[Рекомендации] Ошибка загрузки деталей: {ex.Message}");
                 return;
             }
 
@@ -140,21 +204,14 @@ namespace MovieApp.Pages
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // viewmodel карточки рекомендации (с поддержкой локального кэша постеров)
-    // ══════════════════════════════════════════════════════════════════════════
-
-    /// <summary> viewmodel карточки фильма на странице рекомендаций. поддерживает inotifypropertychanged для асинхронного обновления постера. </summary>
     public sealed class RecMovieViewModel : System.ComponentModel.INotifyPropertyChanged
     {
-        public int     Id        { get; }
-        public string  Title     { get; }
+        public int Id { get; }
+        public string Title { get; }
         public string? PosterUrl { get; }
-        public int?    Year      { get; }
+        public int? Year { get; }
 
         private string? _localPosterPath;
-
-        /// <summary>локальный путь к постеру из кэша; null постер ещё не загружен.</summary>
         public string? LocalPosterPath
         {
             get => _localPosterPath;
@@ -162,24 +219,19 @@ namespace MovieApp.Pages
             {
                 _localPosterPath = value;
                 OnPropertyChanged(nameof(LocalPosterPath));
-                OnPropertyChanged(nameof(HasNoPoster));
             }
         }
 
-        /// <summary>true постер не загружен, отображается заглушка 🎬.</summary>
-        public bool HasNoPoster => string.IsNullOrEmpty(LocalPosterPath);
-
         public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged(string name)
-            => PropertyChanged?.Invoke(this,
-                new System.ComponentModel.PropertyChangedEventArgs(name));
+            => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
 
         public RecMovieViewModel(Movie m)
         {
-            Id        = m.Id;
-            Title     = m.Title;
+            Id = m.Id;
+            Title = m.Title;
             PosterUrl = string.IsNullOrEmpty(m.PosterUrl) ? null : m.PosterUrl;
-            Year      = m.Year;
+            Year = m.Year;
         }
 
         public void SetLocalPath(string path) => LocalPosterPath = path;

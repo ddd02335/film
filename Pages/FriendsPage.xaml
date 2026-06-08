@@ -1,0 +1,317 @@
+<Page x:Class="MovieApp.Pages.FriendsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      mc:Ignorable="d" 
+      d:DesignHeight="700" d:DesignWidth="800"
+      Title="Друзья и Уведомления"
+      Background="#141414">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Сообщество" FontSize="26" FontWeight="Bold" Foreground="White" Margin="16,0,0,16"/>
+
+        <TabControl Grid.Row="1" Background="#1A1A1A" BorderBrush="#2A2A2A" BorderThickness="1" SelectionChanged="TabControl_SelectionChanged">
+            <TabControl.Resources>
+                <!-- Стилизация вкладок -->
+                <Style TargetType="TabItem">
+                    <Setter Property="HeaderTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <ContentPresenter Content="{TemplateBinding Content}"/>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="#AAAAAA"/>
+                    <Setter Property="Padding" Value="20,12"/>
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0,0,0,2" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter x:Name="ContentSite" ContentSource="Header" RecognizesAccessKey="True" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter TargetName="Border" Property="BorderBrush" Value="#E50914"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter TargetName="Border" Property="BorderBrush" Value="Transparent"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="White"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+
+            <!-- Вкладка Мои друзья -->
+            <TabItem x:Name="TabFriends">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="AccountMultiple" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Мои друзья" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Поиск и отправка запроса -->
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="TxtSearchUser" Grid.Column="0" 
+                                 Background="#242424" Foreground="White" BorderBrush="#444444" BorderThickness="1" 
+                                 Padding="8,6" FontSize="13" 
+                                 Tag="Введите логин пользователя..."
+                                 GotFocus="TxtSearchUser_GotFocus" LostFocus="TxtSearchUser_LostFocus"/>
+                        <Button Grid.Column="1" Content="Добавить" Width="120" Margin="12,0,0,0"
+                                Background="#E50914" Foreground="White" BorderThickness="0" Padding="12,6" FontSize="13" FontWeight="SemiBold" Cursor="Hand" Click="BtnAddFriend_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
+
+                    <!-- Списки: входящие запросы и список друзей -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="320"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Список принятых друзей -->
+                        <Border Grid.Column="0" Background="#111111" CornerRadius="6" BorderBrush="#242424" BorderThickness="1" Margin="0,0,12,0" Padding="14">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Text="Список друзей" FontSize="15" FontWeight="Bold" Foreground="White" Margin="0,0,0,12"/>
+                                <TextBlock x:Name="TxtNoFriends" Grid.Row="1" Text="У вас пока нет друзей." Foreground="#888888" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                <ListView x:Name="LvFriends" Grid.Row="1" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                            <Setter Property="Padding" Value="8,6"/>
+                                            <Setter Property="Margin" Value="0,2"/>
+                                            <Setter Property="Background" Value="#1A1A1A"/>
+                                            <Setter Property="BorderBrush" Value="#252525"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
+                                            <Style.Resources>
+                                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#2A2A2A"/>
+                                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
+                                            </Style.Resources>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Аватар и информация друга -->
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <!-- Аватар друга -->
+                                                    <Grid Width="32" Height="32" Margin="0,0,10,0">
+                                                        <Ellipse Fill="{StaticResource AccentRed}" 
+                                                                 Visibility="{Binding HasNoAvatar, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                        <TextBlock Text="{Binding Initials}" 
+                                                                   Foreground="White" 
+                                                                   FontWeight="Bold" 
+                                                                   FontSize="14" 
+                                                                   HorizontalAlignment="Center" 
+                                                                   VerticalAlignment="Center" 
+                                                                   Visibility="{Binding HasNoAvatar, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                        <Ellipse Visibility="{Binding HasAvatar, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                            <Ellipse.Fill>
+                                                                <ImageBrush ImageSource="{Binding AvatarBase64, Converter={StaticResource Base64ToImageConverter}}" Stretch="UniformToFill"/>
+                                                            </Ellipse.Fill>
+                                                        </Ellipse>
+                                                    </Grid>
+
+                                                    <StackPanel VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Login}" FontSize="14" FontWeight="SemiBold" Foreground="White"/>
+                                                        <TextBlock Text="{Binding StatusText}" FontSize="11" Foreground="{Binding StatusColor}"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <Button Style="{x:Null}" Content="Профиль" Tag="{Binding Id}" Click="BtnViewFriendProfile_Click" Padding="8,4" FontSize="11" Background="#2A2A2A" Foreground="White" BorderThickness="1" BorderBrush="#444444" Margin="0,0,6,0" Cursor="Hand"/>
+                                                    <Button Style="{x:Null}" Content="Поделиться оценками" Tag="{Binding Id}" Click="BtnShareRatings_Click" Padding="8,4" FontSize="11" Background="#0078D7" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+                                                    <Button Style="{x:Null}" Content="Удалить из друзей" Tag="{Binding Id}" Click="BtnRemoveFriend_Click" Padding="8,4" FontSize="11" Background="#E50914" Foreground="White" BorderThickness="0" Margin="6,0,0,0" Cursor="Hand"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </Grid>
+                        </Border>
+
+                        <!-- Запросы в друзья (Входящие / Исходящие) -->
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Входящие запросы -->
+                            <Border Grid.Row="0" Background="#111111" CornerRadius="6" BorderBrush="#242424" BorderThickness="1" Margin="0,0,0,6" Padding="14">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Запросы в друзья" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+                                    <TextBlock x:Name="TxtNoIncomingRequests" Grid.Row="1" Text="Нет входящих запросов." Foreground="#666666" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                    <ListView x:Name="LvIncomingRequests" Grid.Row="1" Background="Transparent" BorderThickness="0">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,2">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding User.Login}" FontSize="13" Foreground="White" VerticalAlignment="Center"/>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                        <Button Style="{x:Null}" Content="Принять" Tag="{Binding Id}" Click="BtnAcceptRequest_Click" FontSize="11" Background="#4CAF50" Foreground="White" BorderThickness="0" Padding="6,3" Margin="0,0,4,0" Cursor="Hand"/>
+                                                        <Button Style="{x:Null}" Content="Отклонить" Tag="{Binding Id}" Click="BtnDeclineRequest_Click" FontSize="11" Background="#FF7043" Foreground="White" BorderThickness="0" Padding="6,3" Cursor="Hand"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Grid>
+                            </Border>
+
+                            <!-- Исходящие запросы -->
+                            <Border Grid.Row="1" Background="#111111" CornerRadius="6" BorderBrush="#242424" BorderThickness="1" Margin="0,6,0,0" Padding="14">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Отправленные запросы" FontSize="14" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+                                    <TextBlock x:Name="TxtNoOutgoingRequests" Grid.Row="1" Text="Нет отправленных запросов." Foreground="#666666" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                    <ListView x:Name="LvOutgoingRequests" Grid.Row="1" Background="Transparent" BorderThickness="0">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,2">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Friend.Login}" FontSize="13" Foreground="White" VerticalAlignment="Center"/>
+                                                    <Button Style="{x:Null}" Grid.Column="1" Content="Отмена" Tag="{Binding Id}" Click="BtnCancelRequest_Click" FontSize="11" Background="#2A2A2A" Foreground="#CCCCCC" BorderThickness="1" BorderBrush="#444444" Padding="6,3" Cursor="Hand"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- Вкладка Уведомления -->
+            <TabItem x:Name="TabNotifications">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="Bell" Width="14" Height="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="TxtTabNotificationsHeader" Text="Уведомления" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Text="Ваши уведомления" FontSize="15" FontWeight="Bold" Foreground="White" Margin="0,0,0,12"/>
+                    <TextBlock x:Name="TxtNoNotifications" Grid.Row="1" Text="Уведомлений нет." Foreground="#888888" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                    
+                    <ListView x:Name="LvNotifications" Grid.Row="1" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Padding" Value="12"/>
+                                <Setter Property="Margin" Value="0,4"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRead}" Value="False">
+                                        <Setter Property="Background" Value="#251618"/>
+                                        <Setter Property="BorderBrush" Value="#E50914"/>
+                                        <Setter Property="BorderThickness" Value="1,1,1,1"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsRead}" Value="True">
+                                        <Setter Property="Background" Value="#1A1A1A"/>
+                                        <Setter Property="BorderBrush" Value="#252525"/>
+                                        <Setter Property="BorderThickness" Value="1"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Grid.Column="0">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                            <!-- Иконка типа уведомления -->
+                                            <iconPacks:PackIconMaterial Kind="Share" Width="14" Height="14" Foreground="#E50914" VerticalAlignment="Center" Margin="0,0,8,0" Visibility="{Binding IsShareType}"/>
+                                            <iconPacks:PackIconMaterial Kind="FolderSync" Width="14" Height="14" Foreground="#0078D7" VerticalAlignment="Center" Margin="0,0,8,0" Visibility="{Binding IsImportType}"/>
+                                            
+                                            <TextBlock Text="{Binding HeaderText}" FontWeight="Bold" FontSize="13" Foreground="White" VerticalAlignment="Center"/>
+                                            <TextBlock Text=" • " Foreground="#666666" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding TimeText}" FontSize="11" Foreground="#888888" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Message}" FontSize="13" Foreground="#CCCCCC" TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <!-- Кнопки действий -->
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                                        <!-- Кнопка "Смотреть" для типа MovieShare -->
+                                        <Button Style="{x:Null}" Content="Смотреть" Tag="{Binding Id}" Click="BtnViewSharedMovie_Click" Visibility="{Binding IsShareType}" Padding="10,5" Background="#E50914" Foreground="White" BorderThickness="0" FontWeight="SemiBold" Cursor="Hand" Margin="0,0,6,0"/>
+                                        <!-- Кнопка "Принять" для типа RatingsShare -->
+                                        <Button Style="{x:Null}" Content="Принять" Tag="{Binding Id}" Click="BtnAcceptRatingsShare_Click" Visibility="{Binding IsImportType}" Padding="10,5" Background="#4CAF50" Foreground="White" BorderThickness="0" FontWeight="SemiBold" Cursor="Hand" Margin="0,0,6,0"/>
+                                        <!-- Кнопка "Прочитано" -->
+                                        <Button Style="{x:Null}" Content="Прочитано" Tag="{Binding Id}" Click="BtnMarkAsRead_Click" Visibility="{Binding ShowMarkRead}" Padding="10,5" Background="#2A2A2A" Foreground="#CCCCCC" BorderThickness="1" BorderBrush="#444444" Cursor="Hand"/>
+                                        <Button Style="{x:Null}" Content="Удалить" Tag="{Binding Id}" Click="BtnDeleteNotification_Click" Padding="10,5" Background="#444444" Foreground="White" BorderThickness="0" FontWeight="SemiBold" Cursor="Hand" Margin="6,0,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Page>

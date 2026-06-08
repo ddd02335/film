@@ -1,6 +1,7 @@
 // loginwindow.xaml.cs логика окна авторизации
 using System.Windows;
 using System.Windows.Input;
+using Microsoft.EntityFrameworkCore;
 using MovieApp.Data;
 
 namespace MovieApp
@@ -20,7 +21,7 @@ namespace MovieApp
 
         private void BtnLogin_Click(object sender, RoutedEventArgs e) => AttemptLogin();
 
-        private void AttemptLogin()
+        private async void AttemptLogin()
         {
             string login    = TxtLogin.Text.Trim();
             string password = TxtPassword.Password;
@@ -31,20 +32,42 @@ namespace MovieApp
                 return;
             }
 
-            using var db = new ApplicationDbContext();
-            var user = db.Users.FirstOrDefault(u => u.Login == login && u.Password == password);
-
-            if (user == null)
+            try
             {
-                ShowError("Неверный логин или пароль");
-                TxtPassword.Clear();
-                return;
-            }
+                LoginProgressRing.Visibility = Visibility.Visible;
+                BtnLogin.IsEnabled = false;
 
-            // авторизация успешна открываем главное окно и закрываем
-            var main = new MainWindow(user.Login, user.Role, user.Id);
-            main.Show();
-            Close();
+                using var db = new ApplicationDbContext();
+                var user = await db.Users.FirstOrDefaultAsync(u => u.Login == login && u.Password == password);
+
+                if (user == null)
+                {
+                    ShowError("Неверный логин или пароль");
+                    TxtPassword.Clear();
+                    return;
+                }
+
+                if (user.IsDeleted)
+                {
+                    ShowError("Этот аккаунт был архивирован. Обратитесь к администратору.");
+                    TxtPassword.Clear();
+                    return;
+                }
+
+                // авторизация успешна открываем главное окно и закрываем
+                var main = new MainWindow(user.Login, user.Role, user.Id);
+                main.Show();
+                Close();
+            }
+            catch (System.Exception ex)
+            {
+                ShowError($"Ошибка: {ex.Message}");
+            }
+            finally
+            {
+                LoginProgressRing.Visibility = Visibility.Collapsed;
+                BtnLogin.IsEnabled = true;
+            }
         }
 
         private void ShowError(string message)

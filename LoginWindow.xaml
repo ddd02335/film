@@ -1,6 +1,8 @@
 <Window x:Class="MovieApp.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
         Title="КиноРек — Вход"
         Height="530" Width="400"
         ResizeMode="NoResize"
@@ -11,7 +13,7 @@
         <StackPanel VerticalAlignment="Center" Margin="48,0">
 
             <!-- логотип -->
-            <TextBlock Text="🎬" FontSize="52" HorizontalAlignment="Center"/>
+            <iconPacks:PackIconMaterial Kind="Filmstrip" Width="52" Height="52" Foreground="#E50914" HorizontalAlignment="Center" Margin="0,0,0,8"/>
             <TextBlock Text="КиноРек"
                        FontSize="28" FontWeight="Bold"
                        Foreground="#FFFFFF"
@@ -93,6 +95,7 @@
 
             <!-- переход к регистрации -->
             <Button x:Name="BtnGoToRegister"
+                    Style="{x:Null}"
                     Content="Нет аккаунта? Зарегистрироваться"
                     Background="Transparent"
                     Foreground="#B3B3B3"
@@ -103,5 +106,6 @@
                     Click="BtnGoToRegister_Click"/>
 
         </StackPanel>
+        <metro:ProgressRing x:Name="LoginProgressRing" Foreground="#E50914" Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
     </Grid>
 </Window>
